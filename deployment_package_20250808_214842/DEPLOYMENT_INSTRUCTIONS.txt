@@ -1,0 +1,60 @@
+# Deployment Instructions
+
+## Files Included in This Package
+
+### Core Application Files (11 files):
+- main.py
+- config.py
+- file_monitor.py
+- pdf_parser.py
+- odoo_automation.py
+- sharepoint_client.py
+- email_handler.py
+- gui_config.py
+- credential_manager.py
+- logger_config.py
+- utils.py
+
+### Configuration Files:
+- settings.ini
+- replit.md
+- README.md
+- DEPLOYMENT.md
+
+### Documentation:
+- README.md
+- DEPLOYMENT.md
+- dependencies.txt
+- .gitignore
+
+## Quick Deployment Steps
+
+1. **Extract Files**: Extract this package to your project directory
+
+2. **Initialize Git Repository**:
+   ```bash
+   git init
+   git remote add origin https://github.com/a-a-ronc/intralog-agent-portal.git
+   ```
+
+3. **Commit and Push**:
+   ```bash
+   git add .
+   git commit -m "Initial commit: Racking PM Automation System v1.0"
+   git push -u origin main
+   ```
+
+4. **Production Setup**:
+   - Clone repository on target machine
+   - Install dependencies: `pip install -r dependencies.txt`
+   - Configure settings: `python main.py --config`
+   - Test all connections before going live
+
+## Important Notes
+
+- Sensitive data has been removed from settings.ini
+- You'll need to reconfigure credentials in production
+- See DEPLOYMENT.md for complete setup instructions
+- See README.md for comprehensive documentation
+
+## Generated: 2025-08-08 21:48:42
