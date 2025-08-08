@@ -1,0 +1,154 @@
+Racking PM Automation – Odoo Opportunity Creation, SharePoint Structure, and Watched Folder Workflow
+
+Last updated: Aug 8, 2025
+
+SharePoint Site ID & Drive ID – What They Are
+
+Site ID: A unique identifier for the SharePoint site (workspace) that contains your document library. In your case, the site where “Projects - Documents” lives.
+
+Drive ID: A unique identifier for the specific document library (“drive”) inside that SharePoint site.
+
+Both are required for the Graph API to create folders and move files automatically. The Site ID tells the agent which site to work in; the Drive ID tells it which library within that site.
+
+From your link, the site is worldclassintegration.sharepoint.com/sites/Projects and the drive is the “Shared Documents” library.
+
+SharePoint Site/Drive Picker (In‑Portal)
+
+Goal: Let you select the correct SharePoint Site and Drive from within the agent portal.
+
+Auth & Scopes (Microsoft Graph): offline_access, User.Read, Sites.Read.All, Files.ReadWrite.All.
+
+Flow:
+
+In the portal Settings, click Connect Microsoft 365.
+
+OAuth popup → sign in → consent.
+
+Portal queries your Sites via Graph API and lists them (with search).
+
+Defaults to Projects site based on provided link.
+
+Portal queries the Drives in that Site; defaults to Shared Documents.
+
+Confirm or change selection; store the resulting SITE_ID and DRIVE_ID securely in app settings.
+
+Validation:
+
+“Test” button creates/deletes a temp folder in the chosen drive to confirm access.
+
+If scopes are missing or expired, portal prompts for re‑consent.
+
+Security:
+
+Tokens stored encrypted with rotation.
+
+Disconnect button revokes access and clears stored IDs.
+
+0) User Workflow (Agent Portal + Watched Folder)
+
+Portal watches C:\Users\*\World Class Integration\Projects - Documents.
+
+On detecting DWG/PDF pair with matching stem, the agent:
+
+Parses title block for Customer, Address, Project Manager, Drafter.
+
+Logs into Odoo (browser automation) to create/find Opportunity.
+
+Retrieves Opp # and builds SharePoint folder structure.
+
+Moves/renames files into correct subfolders.
+
+Drafts email to PM (To) + Drafter (CC) requesting Seizmic details.
+
+On reply, fills Seizmic portal form and logs result.
+
+1) Metadata Extraction from PDF Title Block
+
+Fields: Customer Name, Address, Project Manager, Drawn By.
+
+Name→email mapping:
+
+PMs: Aaron Cendejas (aaron@intralog.io), Mark Westover (mark@intralog.io), Indigo Allen (indigo@intralog.io)
+
+Drafters: Vanya Andonova (vanya@intralog.io), Aaron Cendejas (aaron@intralog.io), Michael Schulte (michael@intralog.io)
+
+2) Odoo Opportunity Creation (Browser Automation)
+
+Go to https://intralog.odoo.com/odoo → sign in.
+
+CRM → New.
+
+Fill from title block:
+
+Opportunity Name = Project/Job Title
+
+Salesperson = Project Manager
+
+Customer = Company (create if missing)
+
+Email / Phone = POC if available
+
+Tags = Auto-Intake
+
+Save and capture Opportunity Ref/Number.
+
+Create SharePoint path /Projects - Documents/{Customer}/{Facility Address}/Opp #<OppNo>- <ProjectName>/... and move DWG/PDF.
+
+3) SharePoint Folder Creation
+
+Canonical path: /Projects - Documents/<CustomerName>/<FacilityAddress>/Opp #<OppNo>- <ProjectName>/
+
+Subfolders:
+
+DWG/
+
+PDF/
+
+Calculations/
+
+Vendors/
+
+Purchase Order/
+
+Photos/
+
+PPT/
+
+Proposals/
+
+As Built/ at facility address level.
+
+Moves DWG/PDF into correct subfolders after Opp creation.
+
+4) Seizmic Portal Data Collection & Submission
+
+Email PM (To) + Drafter (CC) requesting: Prelim Type, Manufacturer, Rack Type, Anchor Type.
+
+Wait for reply → parse values.
+
+Log into https://portal.seizmicinc.com/ (PM creds from secure vault) → Prelim Client Requests → Add Request.
+
+Fill fields and save (dry-run until enabled).
+
+Capture confirmation screenshot and log in SharePoint.
+
+5) Error Handling
+
+No DWG/PDF match → log and hold.
+
+Missing title block data → request via email.
+
+Odoo creation failure → escalate.
+
+Portal failure → capture HTML + screenshot and pause.
+
+6) Onboarding Checklist
+
+SharePoint Site ID & Drive ID via in‑portal picker (defaults pre‑filled from your link).
+
+Automation mailbox: agent@intralog.io (delegated access).
+
+Confirm subfolders list (finalized).
+
+Approval for file move/rename (approved).
+
